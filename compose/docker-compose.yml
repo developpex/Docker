@@ -1,0 +1,15 @@
+# compose version
+version: "3"
+
+# difine services / containers
+services:
+    redis-server:
+        #image to use
+        image: "redis"
+    node-app:
+        #Use the 'always' restart policy
+        restart: always
+        #Look inside current dir for a dockerfile
+        build: .
+        ports:
+            - "4001:8081"
