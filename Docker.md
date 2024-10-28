@@ -25,6 +25,19 @@ docker start <container id>
 docker start -a <container id>
 ```
 
+**Run a docker container inside linux (wsl)**
+```
+--build
+docker build -f Dockerfile.dev -t USERNAME:frontend .
+
+--run
+docker run -it -p 3000:3000 -v /app/node_modules -v ~/<folder>:/app USERNAME:frontend
+
+-v                          volumeswitch
+-v /app/node_modules        put a bookmark on the node modules folder
+-v ~/<folder>:/app          map the <folder> to the :/app directory
+```
+
 **Stop running containers**
 
 ```
@@ -65,6 +78,9 @@ docker exec -it <container id> sh
 
 -- execute one command
 docker exec -it <container id> <command>
+
+-- attach to the stdin / stdout / stderr of the container
+docker attach <container id> <command>
 ```
 
 **FLAGS**
@@ -108,6 +124,9 @@ docker build <directory>
 
 -- build dockerfile inside current dir
 docker build .
+
+-- build developer dockerfile inside current dir
+docker build -f Dockerfile.dev .
 
 -- build dockerfile with image tag
 docker build -t <dockerid/projectname:version>
