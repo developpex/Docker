@@ -1,3 +1,4 @@
+# PRODUCTION EXAMPLE DOCKER COMPOSE USING DOCKERFILE.DEV
 version: "3" # Specify the Docker Compose version
 
 services: # Define the services for the application

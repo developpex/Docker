@@ -1,0 +1,17 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  #build de dockerfile.dev in the client folder and set the wherabout of the file to (./client)
+  - docker build -t developpex/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run developpex/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t developpex/multi-client ./client
+  - docker build -t developpex/multi-nginx ./nginx
+  - docker build -t developpex/multi-server ./server
+  - docker build -t developpex/multi-worker ./worker
+

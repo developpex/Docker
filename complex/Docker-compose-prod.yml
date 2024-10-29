@@ -1,0 +1,39 @@
+# PRODUCTION EXAMPLE DOCKER COMPOSE
+version: "3"
+
+services:
+  postgres:
+    image: "postgres:latest"
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+
+  redis:
+    image: "redis:latest"
+
+  nginx:
+    image: "developpex/multi-nginx:latest"
+    ports:
+      - "8080:80"
+    restart: always
+
+  api:
+    image: "developpex/multi-server:latest"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+
+  client:
+    image: "developpex/multi-client:latest"
+    environment:
+      - WDS_SOCKET_PORT=0
+
+  worker:
+    image: "developpex/multi-worker:latest"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
