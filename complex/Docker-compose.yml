@@ -1,0 +1,56 @@
+version: "3" # Specify the Docker Compose version
+
+services: # Define the services for the application
+
+  postgres: # PostgreSQL database service
+    image: "postgres:latest" # Use the latest PostgreSQL image from Docker Hub
+    environment: # Environment variables for configuring PostgreSQL
+      - POSTGRES_PASSWORD=postgres_password # Set the password for the default PostgreSQL user (required)
+
+  redis: # Redis service
+    image: "redis:latest" # Use the latest Redis image from Docker Hub
+
+  nginx: # Nginx service for reverse proxy
+    restart: always # Automatically restart Nginx if it crashes
+    build: # Build options for Nginx service
+      dockerfile: Dockerfile.dev # Specify the Dockerfile to use for this build
+      context: ./nginx # Specify the build context, pointing to the Nginx configuration folder
+    ports:
+      - "8080:80" # Map port 80 in the container to port 8080 on the host
+
+  api: # API service
+    build: # Build options for the API service
+      dockerfile: Dockerfile.dev # Specify the Dockerfile to use for this build
+      context: ./server # Specify the build context, pointing to the API code folder
+    volumes:
+      - /app/node_modules # Ensure node_modules are not overwritten by mounting
+      - ./server:/app # Mount the local server folder to the /app directory in the container
+    environment: # Environment variables for connecting the API to Redis and PostgreSQL
+      - REDIS_HOST=redis # Define Redis host as the Redis container
+      - REDIS_PORT=6379 # Define Redis port
+      - PGUSER=postgres # PostgreSQL username
+      - PGHOST=postgres # PostgreSQL host, set to the name of the postgres container
+      - PGDATABASE=postgres # PostgreSQL database name
+      - PGPASSWORD=postgres_password # PostgreSQL password
+      - PGPORT=5432 # PostgreSQL port
+
+  client: # Client service for the frontend
+    build: # Build options for the client service
+      dockerfile: Dockerfile.dev # Specify the Dockerfile to use for this build
+      context: ./client # Specify the build context, pointing to the client code folder
+    volumes:
+      - /app/node_modules # Ensure node_modules are not overwritten by mounting
+      - ./client:/app # Mount the local client folder to the /app directory in the container
+    environment: # Environment variables for the client
+      - WDS_SOCKET_PORT=0 # Set the Webpack Dev Server socket port to 0 (useful for Docker setups)
+
+  worker: # Worker service for background processing
+    build: # Build options for the worker service
+      dockerfile: Dockerfile.dev # Specify the Dockerfile to use for this build
+      context: ./worker # Specify the build context, pointing to the worker code folder
+    volumes:
+      - /app/node_modules # Ensure node_modules are not overwritten by mounting
+      - ./worker:/app # Mount the local worker folder to the /app directory in the container
+    environment: # Environment variables for the worker service
+      - REDIS_HOST=redis # Define Redis host as the Redis container
+      - REDIS_PORT=6379 # Define Redis port
